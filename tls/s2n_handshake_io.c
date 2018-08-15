@@ -344,7 +344,12 @@ skip_cache_lookup:
 
     s2n_cert_auth_type client_cert_auth_type;
     GUARD(s2n_connection_get_client_auth_type(conn, &client_cert_auth_type));
-    if(client_cert_auth_type != S2N_CERT_AUTH_NONE) {
+
+    if (conn->mode == S2N_CLIENT && client_cert_auth_type == S2N_CERT_AUTH_REQUIRED) {
+        /* If we're a client, and Client Auth is REQUIRED, then the Client must expect the CLIENT_CERT_REQ Message */
+        conn->handshake.handshake_type |= CLIENT_AUTH;
+    } else if (conn->mode == S2N_SERVER && client_cert_auth_type != S2N_CERT_AUTH_NONE) {
+        /* If we're a server, and Client Auth is REQUIRED or OPTIONAL, then the server must send the CLIENT_CERT_REQ Message*/
         conn->handshake.handshake_type |= CLIENT_AUTH;
     }
 

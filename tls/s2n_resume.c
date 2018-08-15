@@ -593,7 +593,8 @@ int s2n_config_wipe_expired_ticket_crypto_keys(struct s2n_config *config, int8_t
     return 0;
 }
 
-int s2n_verify_unique_ticket_key(struct s2n_config *config, uint8_t *hash, uint16_t *insert_index) {
+int s2n_verify_unique_ticket_key(struct s2n_config *config, uint8_t *hash, uint16_t *insert_index)
+{
     int low = 0;
     int top = config->ticket_key_hashes->num_of_elements - 1;
 
