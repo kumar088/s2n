@@ -10,6 +10,7 @@ import Cryptol::Extras
 conn_set_handshake_type : connection -> connection
 conn_set_handshake_type conn = conn'
   where conn' = {handshake = handshake'
+                ,use_tickets = conn.use_tickets
                 ,mode = conn.mode
                 ,corked_io = conn.corked_io
                 ,corked = conn.corked
@@ -21,10 +22,12 @@ conn_set_handshake_type conn = conn'
         (handshake' : handshake) = {handshake_type = handshake_type'
                                    ,message_number = conn.handshake.message_number
                                    }
+                                                                  
         handshake_type' = NEGOTIATED || full_handshake ||
                           (if (full_handshake != 0) then
                             perfect_forward_secrecy || ocsp_status || client_auth
                             else zero)
+
         full_handshake  = if (conn.is_caching_enabled && ~conn.resume_from_cache)
                           then zero
                           else FULL_HANDSHAKE
@@ -43,6 +46,7 @@ conn_set_handshake_type conn = conn'
 advance_message : connection -> connection
 advance_message conn = conn2
   where conn2 = {handshake = handshake2
+                ,use_tickets = conn.use_tickets   
                 ,mode = conn.mode
                 ,corked_io = conn.corked_io
                 ,corked = cork2
@@ -55,6 +59,7 @@ advance_message conn = conn2
         (handshake2 : handshake) = {handshake_type = conn.handshake.handshake_type
                                    ,message_number = conn.handshake.message_number + 1
                                    }
+   
         cork2 = if ((ACTIVE_STATE conn2).writer != (PREVIOUS_STATE conn2).writer)
                 then if (ACTIVE_STATE conn2).writer == mode_writer conn2.mode
                      then s2n_cork conn else s2n_uncork conn
@@ -105,6 +110,7 @@ s2nTrans conn = conn''
 // Part of the s2n_connection struct that s2n_advance_message
 // uses. The names of the fields are the same as in C.
 type connection = {handshake : handshake
+                  ,use_tickets : [8]  
                   ,mode : [32]
                   ,corked_io : [8]
                   ,corked : [2]

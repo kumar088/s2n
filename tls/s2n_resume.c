@@ -493,11 +493,12 @@ int s2n_encrypt_session_ticket(struct s2n_connection *conn, struct s2n_stuffer *
     return 0;
 }
 
-int s2n_decrypt_session_ticket(struct s2n_connection *conn, struct s2n_stuffer *from)
+int s2n_decrypt_session_ticket(struct s2n_connection *conn)
 {
     struct s2n_ticket_key *key;
     struct s2n_session_key aes_ticket_key;
     struct s2n_blob aes_key_blob;
+    struct s2n_stuffer *from = &conn->client_ticket_to_decrypt;
 
     uint8_t key_name[S2N_TICKET_KEY_NAME_LEN];
 
