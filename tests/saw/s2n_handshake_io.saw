@@ -126,8 +126,7 @@ let setup_connection = do {
 
    let client_cert_auth_type = {{ if cca_ov != 0 then cca else config_cca }};
 
-   return (pconn, {{ {corked_io = corked_io	
-   				     ,use_tickets = use_tickets	                    				
+   return (pconn, {{ {corked_io = corked_io	                				
                      ,mode      = mode
                      ,handshake = {message_number = message_number
 		                  ,handshake_type = handshake_type}
